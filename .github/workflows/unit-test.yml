@@ -18,6 +18,7 @@ jobs:
         with:
           java-version: 8
           cache: maven
+          distribution: 'temurin'
       - name: Run tests
         run: mvn clean test -B --file pom.xml
       - name: Update dependency graph
