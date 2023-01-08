@@ -1,12 +1,15 @@
 package org.example.api.utils.result;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.text.MessageFormat;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class Result<T> {
     private int code;
     private String msg;
@@ -16,11 +19,12 @@ public class Result<T> {
         return new Result<>(Status.SUCCESS.getCode(), Status.SUCCESS.getMsg(), data);
     }
 
+    @JsonIgnore
     public boolean isSuccess() {
         return this.code == Status.SUCCESS.getCode();
     }
 
-    public static <T> Result<T> error(Status status, Object... args) {
+    public static Result<Object> error(Status status, Object... args) {
         String msg;
         if (args.length > 0) {
             msg = MessageFormat.format(status.getMsg(), args);
@@ -30,7 +34,7 @@ public class Result<T> {
         return new Result<>(status.getCode(), msg, null);
     }
 
-    public static <T> Result<T> error(int code, String msg) {
+    public static Result<Object> error(int code, String msg) {
         return new Result<>(code, msg, null);
     }
 }

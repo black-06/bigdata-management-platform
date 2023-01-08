@@ -1,0 +1,6 @@
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    username: root
+    password: root
+    url: jdbc:h2:mem:bmp;MODE=MySQL;INIT=runscript from 'classpath:init.sql'

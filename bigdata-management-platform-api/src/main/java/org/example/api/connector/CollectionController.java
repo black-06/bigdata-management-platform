@@ -25,7 +25,7 @@ public class CollectionController {
         return collectionService.createCollection(collection);
     }
 
-    @GetMapping("/list")
+    @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(Status.QUERY_COLLECTION_ERROR)
     public Result<List<Collection>> queryCollectionList() {
