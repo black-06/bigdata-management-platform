@@ -7,10 +7,10 @@ Content-Type: application/json
   "type": "HIVE",
   "connectorInfo": {
     "type": "HIVE",
-    "host": "127.0.0.1",
-    "port": "10000",
+    "host": "10.0.1.178",
+    "port": "10067",
     "username": "root",
-    "password": "root"
+    "password": "Sudodata-123"
   },
   "collectionID": 1,
   "syncPaths": [
@@ -20,7 +20,8 @@ Content-Type: application/json
       ]
     }
   ],
-  "syncExecuteTime": 1673675752.371000000
+  "syncExecuteTime": 1673675752.371000000,
+  "syncInterval": "PT1M"
 }
 
 ### list hive asset

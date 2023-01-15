@@ -7,7 +7,7 @@ spring:
 
 logging:
   level:
-    com.github.bmp.dao.mapper: debug
+    com.bmp.dao.mapper: debug
 
 platform:
   mem:
