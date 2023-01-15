@@ -1,0 +1,78 @@
+### creat hive datasource
+POST http://localhost:8080/datasource
+Content-Type: application/json
+
+{
+  "name": "test_hive",
+  "type": "HIVE",
+  "connectorInfo": {
+    "type": "HIVE",
+    "host": "127.0.0.1",
+    "port": "10000",
+    "username": "root",
+    "password": "root"
+  },
+  "collectionID": 1,
+  "syncPaths": [
+    {
+      "paths": [
+        "default"
+      ]
+    }
+  ],
+  "syncExecuteTime": 1673675752.371000000
+}
+
+### list hive asset
+GET http://localhost:8080/asset?datasourceID=1&withColumns=true
+
+### create tags
+POST http://localhost:8080/tag
+Content-Type: application/json
+
+[
+  {
+    "name": "table_tag_test_1"
+  },
+  {
+    "name": "table_tag_test_2"
+  },
+  {
+    "name": "column_tag_test_3"
+  },
+  {
+    "name": "column_tag_test_4"
+  }
+]
+
+### bind tag
+POST http://localhost:8080/tag/batch_update
+Content-Type: application/json
+
+{
+  "bind": [
+    {
+      "subjectID": 1,
+      "subjectType": "TABLE",
+      "tagID": 1
+    },
+    {
+      "subjectID": 1,
+      "subjectType": "TABLE",
+      "tagID": 2
+    },
+    {
+      "subjectID": 1,
+      "subjectType": "COLUMN",
+      "tagID": 3
+    },
+    {
+      "subjectID": 11,
+      "subjectType": "COLUMN",
+      "tagID": 4
+    }
+  ]
+}
+
+### list asset with tags and columns
+GET http://localhost:8080/asset?datasourceID=1&withTags=true&withColumns=true&withColumnTags=true

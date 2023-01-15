@@ -1,0 +1,20 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: root
+    url: jdbc:mysql://127.0.0.1:3306/bmp
+  sql:
+    init:
+      schema-locations: classpath:schema_mysql.sql
+      mode: always
+
+
+logging:
+  level:
+    com.github.bmp: debug
+    org.springframework.retry: debug
+
+platform:
+  mem:
+    consumer-size: 2
