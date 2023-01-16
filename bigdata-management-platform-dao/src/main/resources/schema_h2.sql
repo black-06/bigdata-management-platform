@@ -61,7 +61,6 @@ CREATE TABLE `catalog_column`
     `description`   VARCHAR(2048) DEFAULT NULL,
     `asset_id`      INT(20)       NOT NULL,
     `type`          VARCHAR(2048) NOT NULL,
-    `nested_info`   TEXT          DEFAULT NULL,
     `comment`       VARCHAR(2048) DEFAULT NULL,
     `default_value` VARCHAR(2048) DEFAULT NULL,
     PRIMARY KEY (`id`)

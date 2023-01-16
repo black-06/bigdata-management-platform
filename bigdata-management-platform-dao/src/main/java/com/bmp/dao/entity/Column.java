@@ -3,7 +3,6 @@ package com.bmp.dao.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.bmp.commons.enums.SubjectType;
-import com.bmp.connector.api.nested.NestedInfo;
 import com.bmp.dao.utils.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -24,8 +23,6 @@ public class Column extends BaseEntity implements Subject {
     private Integer assetID;
     @TableField("type")
     private String type;
-    @TableField("nested_info")
-    private NestedInfo nestedInfo;
     @TableField("comment")
     private String comment;
     @TableField("default_value")

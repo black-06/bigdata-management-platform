@@ -119,7 +119,6 @@ public class MetaSyncTask extends Task {
                 .setDescription(null)
                 .setAssetID(assetID)
                 .setType(column.getType())
-                .setNestedInfo(null)
                 .setComment(column.getComment())
                 .setDefaultValue(column.getDefault())
         ).collect(Collectors.toList());

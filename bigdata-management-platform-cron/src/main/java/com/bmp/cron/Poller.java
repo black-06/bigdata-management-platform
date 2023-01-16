@@ -7,8 +7,6 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -39,44 +37,39 @@ public class Poller {
      * @param <R>              raw task models
      * @param <T>              {@link Task}
      */
-    public static <R, T extends Task> Timer start(
+    public static <R, T extends Task> void start(
             Broker broker,
             Supplier<List<R>> retriever,
             Function<R, T> builder,
             Consumer<T> postTaskAddition
     ) {
         logger.info("start poller send");
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                try {
-                    List<R> raws = retriever.get();
-                    if (CollectionUtils.isEmpty(raws)) {
-                        return;
-                    }
-                    for (R raw : raws) {
-                        T task = builder.apply(raw);
-                        try {
-                            Task.validate(task);
-                        } catch (IllegalArgumentException e) {
-                            logger.error("validate failed, task: {}", task);
-                            continue;
-                        }
-                        service.schedule(() -> {
-                            try {
-                                broker.send(task);
-                                postTaskAddition.accept(task);
-                            } catch (Exception e) {
-                                logger.error("send task failed", e);
-                            }
-                        }, task.getExecuteDelay().toNanos(), TimeUnit.NANOSECONDS);
-                    }
-                } catch (Exception e) {
-                    logger.error("error encountered where sending task", e);
+        service.scheduleAtFixedRate(() -> {
+            try {
+                List<R> raws = retriever.get();
+                if (CollectionUtils.isEmpty(raws)) {
+                    return;
                 }
+                for (R raw : raws) {
+                    T task = builder.apply(raw);
+                    try {
+                        Task.validate(task);
+                    } catch (IllegalArgumentException e) {
+                        logger.error("validate failed, task: {}", task);
+                        continue;
+                    }
+                    service.schedule(() -> {
+                        try {
+                            broker.send(task);
+                            postTaskAddition.accept(task);
+                        } catch (Exception e) {
+                            logger.error("send task failed", e);
+                        }
+                    }, task.getExecuteDelay().toNanos(), TimeUnit.NANOSECONDS);
+                }
+            } catch (Exception e) {
+                logger.error("error encountered where sending task", e);
             }
-        }, 0, INTERVAL.toMillis());
-        return timer;
+        }, 0, INTERVAL.toMillis(), TimeUnit.MILLISECONDS);
     }
 }

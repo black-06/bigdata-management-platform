@@ -64,7 +64,7 @@ public class HiveLister implements Lister {
     private Lister.Asset descDatabase(AssetPath database) {
         return new Lister.Asset()
                 .setName(database.getName())
-                .setType(AssetType.TABLE)
+                .setType(AssetType.DATABASE)
                 .setPath(database);
     }
 

@@ -7,7 +7,6 @@ import org.mockito.Mockito;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
 import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -23,7 +22,7 @@ public class PollerTest {
         CountDownLatch latch = new CountDownLatch(size);
         List<Task> tasks = new ArrayList<>();
 
-        Timer timer = Poller.start(
+        Poller.start(
                 new Broker() {
                     @Override
                     public void send(Task task) {
@@ -46,11 +45,7 @@ public class PollerTest {
         );
 
         // wait group
-        assertDoesNotThrow(() -> {
-            latch.await();
-            timer.cancel();
-        });
-
+        assertDoesNotThrow(() -> latch.await());
         assertEquals(size, tasks.size());
     }
 
