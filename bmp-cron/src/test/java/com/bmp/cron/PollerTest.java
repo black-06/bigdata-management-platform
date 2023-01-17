@@ -32,7 +32,6 @@ public class PollerTest {
 
                     @Override
                     public void startConsume() {
-
                     }
                 },
                 // retriever

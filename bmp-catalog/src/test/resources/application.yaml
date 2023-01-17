@@ -3,7 +3,11 @@ spring:
     driver-class-name: org.h2.Driver
     username: root
     password: root
-    url: jdbc:h2:file:D:\Project\bigdata-management-platform\bmp;AUTO_SERVER=TRUE;MODE=MySQL;INIT=runscript from 'classpath:schema_h2.sql'
+    url: jdbc:h2:./target/bmp;MODE=MySQL
+  sql:
+    init:
+      schema-locations: classpath:schema_h2.sql
+      mode: always
 
 logging:
   level:

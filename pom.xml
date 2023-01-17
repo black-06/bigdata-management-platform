@@ -4,18 +4,18 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.bmp</groupId>
-    <artifactId>bigdata-management-platform</artifactId>
+    <artifactId>bmp</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
-        <module>bigdata-management-platform-standalone-server</module>
-        <module>bigdata-management-platform-common</module>
-        <module>bigdata-management-platform-cron</module>
-        <module>bigdata-management-platform-connector</module>
-        <module>bigdata-management-platform-search</module>
-        <module>bigdata-management-platform-dao</module>
-        <module>bigdata-management-platform-catalog</module>
-        <module>bigdata-management-platform-analysis</module>
+        <module>bmp-standalone-server</module>
+        <module>bmp-common</module>
+        <module>bmp-cron</module>
+        <module>bmp-connector</module>
+        <module>bmp-search</module>
+        <module>bmp-dao</module>
+        <module>bmp-catalog</module>
+        <module>bmp-analysis</module>
     </modules>
 
     <properties>
@@ -51,6 +51,12 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
+                <version>4.5.1</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-inline</artifactId>
                 <version>4.5.1</version>
                 <scope>test</scope>
             </dependency>

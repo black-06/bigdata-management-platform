@@ -33,11 +33,11 @@ mvn clean package
 ## Start
 
 ```shell
-java -jar ./bigdata-management-platform-catalog/target/bigdata-management-platform-catalog-1.0-SNAPSHOT.jar
+java -jar ./bmp-catalog/target/bmp-catalog-1.0-SNAPSHOT.jar
 ```
 
 Or debug entry point
-is [Application.java](./bigdata-management-platform-catalog/src/main/java/com/bmp/catalog/Application.java)
+is [Application.java](./bmp-catalog/src/main/java/com/bmp/catalog/Application.java)
 
 ## Demo
 
