@@ -70,6 +70,6 @@ public class Poller {
             } catch (Exception e) {
                 logger.error("error encountered where sending task", e);
             }
-        }, 0, INTERVAL.toMillis(), TimeUnit.MILLISECONDS);
+        }, INTERVAL.toMillis(), INTERVAL.toMillis(), TimeUnit.MILLISECONDS);
     }
 }

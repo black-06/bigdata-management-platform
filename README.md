@@ -20,8 +20,8 @@ mvn clean test
 1. Start MySQL and create database
 
 ```shell
-docker run -name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root mysql:5.6
-docker exec mysql mysql -u root -proot CREATE DATABASE `bmp` CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';
+docker run -itd --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root mysql:5.7
+docker exec mysql mysql -u root -proot -e "CREATE DATABASE bmp CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';"
 ```
 
 2. Build jar
@@ -47,6 +47,18 @@ is [Application.java](./bigdata-management-platform-catalog/src/main/java/com/bm
 docker-compose -f ./demo/hive_datasource/docker-compose.yml -p data up -d
 ```
 
-2. Request [demo.http](./demo/demo.http)
+2. create HIVE table
+
+```shell
+docker exec data-hive-server-1 hive -f /tables.sql
+```
+
+3. Request [demo.http](./demo/demo.http)
    with [VS Code REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client)
    or [JetBrains HTTP Client Editor](https://www.jetbrains.com/help/idea/http-client-in-product-code-editor.html)
+
+4. stop HIVE datasource
+
+```shell
+docker-compose -f ./demo/hive_datasource/docker-compose.yml -p data down
+```

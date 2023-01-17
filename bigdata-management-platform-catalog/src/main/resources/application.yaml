@@ -2,8 +2,8 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
-    password: Sudodata-123
-    url: jdbc:mysql://10.0.1.178:3306/bmp
+    password: root
+    url: jdbc:mysql://127.0.0.1:3306/bmp
   sql:
     init:
       schema-locations: classpath:schema_mysql.sql
