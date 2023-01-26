@@ -1,5 +1,7 @@
 package com.bmp.catalog.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.bmp.catalog.dto.ListCollectionRequest;
 import com.bmp.catalog.service.CollectionService;
 import com.bmp.commons.exceptions.ApiException;
 import com.bmp.commons.result.Result;
@@ -8,8 +10,6 @@ import com.bmp.dao.entity.Collection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("collection")
@@ -21,8 +21,8 @@ public class CollectionController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(value = Status.CREATE_ERROR_ARGS, args = {"collection"})
-    public Result<?> createCollection(@RequestBody Collection collection) {
-        return Result.success(collectionService.insert(collection));
+    public Result<Collection> createCollection(@RequestBody Collection collection) {
+        return collectionService.createCollection(collection);
     }
 
 
@@ -46,8 +46,8 @@ public class CollectionController {
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(value = Status.QUERY_ERROR_ARGS, args = {"collection"})
-    public Result<List<Collection>> queryCollectionList() {
-        return collectionService.listCollection();
+    public Result<IPage<Collection>> queryCollectionList(ListCollectionRequest request) {
+        return collectionService.listCollection(request);
     }
 
 

@@ -1,7 +1,6 @@
 package com.bmp.cron;
 
 import com.bmp.cron.broker.Broker;
-import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,9 +19,9 @@ public class Poller {
     private static final ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
 
     /**
-     * Poller periodically does a set of subroutines specified by {@code "retriever"}, {@code "taskBuilder"} and
-     * {@code postTaskAddition} to find tasks and push them into an underlying message queue for execution.
-     * The period is specified by queryInterval.
+     * Poller periodically ({@link #INTERVAL}) does a set of subroutines specified by {@code "retriever"},
+     * {@code "taskBuilder"} and {@code postTaskAddition} to find tasks and push them into an underlying
+     * message queue for execution. The period is specified by queryInterval.
      *
      * @param broker           see {@link Broker}
      * @param retriever        is a subroutine to get task models to be executed from the upper level task
@@ -45,31 +44,11 @@ public class Poller {
     ) {
         logger.info("start poller send");
         service.scheduleAtFixedRate(() -> {
-            try {
-                List<R> raws = retriever.get();
-                if (CollectionUtils.isEmpty(raws)) {
-                    return;
-                }
-                for (R raw : raws) {
-                    T task = builder.apply(raw);
-                    try {
-                        Task.validate(task);
-                    } catch (IllegalArgumentException e) {
-                        logger.error("validate failed, task: {}", task);
-                        continue;
-                    }
-                    service.schedule(() -> {
-                        try {
-                            broker.send(task);
-                            postTaskAddition.accept(task);
-                        } catch (Exception e) {
-                            logger.error("send task failed", e);
-                        }
-                    }, task.getExecuteDelay().toNanos(), TimeUnit.NANOSECONDS);
-                }
-            } catch (Exception e) {
-                logger.error("error encountered where sending task", e);
-            }
+            // TODO: get R list from retriever
+            // TODO: build task by builder
+            // TODO: schedule by task execute delay
+            //       a. send task to broker
+            //       b. call PostTaskAddition function
         }, INTERVAL.toMillis(), INTERVAL.toMillis(), TimeUnit.MILLISECONDS);
     }
 }

@@ -44,8 +44,12 @@ public class Datasource extends BaseEntity implements Subject {
     private Integer collectionID;
 
     /* meta sync info */
-    @TableField(value = "sync_paths", typeHandler = AssetPathListHandlerList.class)
+    @TableField(value = "sync_paths", typeHandler = AssetPathListHandler.class)
     private List<AssetPath> syncPaths;
+    /**
+     * next execute time for sync task.
+     * When it's null, this datasource doesn't need to execute.
+     */
     @TableField(value = "sync_execute_time", updateStrategy = FieldStrategy.IGNORED)
     private Instant syncExecuteTime;
     @TableField(value = "sync_interval", typeHandler = DurationTypeHandler.class)
@@ -99,7 +103,7 @@ public class Datasource extends BaseEntity implements Subject {
         }
     }
 
-    public static class AssetPathListHandlerList extends JacksonListTypeHandler<AssetPath> {
+    public static class AssetPathListHandler extends JacksonListTypeHandler<AssetPath> {
         @Override
         protected TypeReference<List<AssetPath>> getTypeReference() {
             return new TypeReference<List<AssetPath>>() {

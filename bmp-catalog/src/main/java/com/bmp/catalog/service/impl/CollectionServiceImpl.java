@@ -1,5 +1,9 @@
 package com.bmp.catalog.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.bmp.catalog.dto.ListCollectionRequest;
 import com.bmp.catalog.service.CollectionService;
 import com.bmp.commons.result.Result;
 import com.bmp.commons.result.Status;
@@ -13,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +25,16 @@ public class CollectionServiceImpl extends BaseServiceImpl<CollectionMapper, Col
     private final Logger logger = LoggerFactory.getLogger(CollectionServiceImpl.class);
 
     private final CollectionMapper collectionMapper;
+
+    @Override
+    public Result<Collection> createCollection(Collection collection) {
+        Instant now = Instant.now();
+        collection.setId(null);
+        collection.setCreateTime(now);
+        collection.setUpdateTime(now);
+        collectionMapper.insert(collection);
+        return Result.success(collection);
+    }
 
     @Override
     public Result<Collection> updateCollection(Collection update) {
@@ -45,8 +58,12 @@ public class CollectionServiceImpl extends BaseServiceImpl<CollectionMapper, Col
     }
 
     @Override
-    public Result<List<Collection>> listCollection() {
-        List<Collection> collections = collectionMapper.selectList(null);
+    public Result<IPage<Collection>> listCollection(ListCollectionRequest request) {
+        // query collections with conditions lambda.
+        Page<Collection> collections = collectionMapper.selectPage(request.getPage(), new QueryWrapper<Collection>()
+                .lambda()
+                .in(Collection::getId, request.getIds())
+        );
         return Result.success(collections);
     }
 

@@ -8,6 +8,9 @@ import lombok.experimental.Accessors;
 
 import java.time.Instant;
 
+/**
+ * common fields for all table models.
+ */
 @Data
 @Accessors(chain = true)
 public class BaseEntity {

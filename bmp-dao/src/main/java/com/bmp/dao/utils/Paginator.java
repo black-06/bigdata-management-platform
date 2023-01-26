@@ -5,6 +5,9 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * request paginator param
+ */
 @Data
 public class Paginator {
     private int size;

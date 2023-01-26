@@ -15,6 +15,9 @@ import lombok.experimental.Accessors;
 
 import java.time.Instant;
 
+/**
+ * Asset stores database and table object.
+ */
 @Data
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
@@ -24,6 +27,10 @@ public class Asset extends BaseEntity implements Subject {
     private String name;
     @TableField("description")
     private String description;
+    /**
+     * If the asset is table, the parent id is database id.
+     * If the asset is database, the parent id is 0 (no parent).
+     */
     @TableField("parent_id")
     private Integer parentID;
     @TableField("datasource_id")
@@ -35,6 +42,9 @@ public class Asset extends BaseEntity implements Subject {
     @JsonIgnore
     @TableField(value = "asset_path", typeHandler = JacksonTypeHandler.class)
     private AssetPath assetPath;
+    /**
+     * only for {@link AssetType#FILESET}
+     */
     @TableField("file_type")
     private FileType fileType;
     @TableField("comment")

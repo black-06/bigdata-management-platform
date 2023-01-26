@@ -85,35 +85,24 @@ public abstract class Task implements Serializable {
         return mapper.readValue(json, Task.class);
     }
 
+    /**
+     * TODO: validate the task params. see {@link Validate}
+     *
+     * @param task task
+     */
     public static void validate(Task task) {
-        Validate.notNull(task, "task is null");
-        Validate.notNull(task.getId(), "task id is null");
-        Validate.notNull(task.type(), "task type is null");
-        Validate.notNull(task.getExecuteDelay(), "task execute delay is null");
-        if (task.getRecurringInterval() != null && task.getRecurringInterval().compareTo(minimalInterval) < 0) {
-            throw new IllegalArgumentException(String.format("task recurring interval is wrong, it should be greater than %s", minimalInterval));
-        }
     }
 
+    /**
+     * TODO:
+     *  1. validate task
+     *  2. run the task and exp retry when error occurs. see {@link RetryTemplate}
+     * <p>
+     *  this function should handle all errors without throwing up.
+     *
+     * @param task task.
+     */
     public static void execute(Task task) {
-        try {
-            validate(task);
-            RetryTemplate.builder()
-                    .withinMillis(task.getTimeout())
-                    .exponentialBackoff(task.getInitialInterval(), task.getMultiplier(), task.getMaxInterval(), true)
-                    .build()
-                    .execute(context -> {
-                        try {
-                            task.run();
-                        } catch (Throwable e) {
-                            logger.error("run task failed at {}", context.getRetryCount(), e);
-                            throw e;
-                        }
-                        return null;
-                    });
-        } catch (Throwable e) {
-            logger.error("run task failed", e);
-        }
     }
 }
 

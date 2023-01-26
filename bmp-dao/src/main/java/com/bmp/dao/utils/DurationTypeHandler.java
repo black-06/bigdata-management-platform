@@ -9,6 +9,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Duration;
 
+/**
+ * convert {@link Duration} to nanos (long).
+ */
 public class DurationTypeHandler extends BaseTypeHandler<Duration> {
 
     @Override

@@ -6,6 +6,9 @@ import com.bmp.connector.api.list.Lister;
 
 import java.sql.SQLException;
 
+/**
+ * Connector interface for any 2d datasource.
+ */
 public interface Connector {
     void ping() throws SQLException;
 

@@ -11,9 +11,17 @@ public enum SubjectType {
     @Deprecated
     ASSET(3),
     COLUMN(4),
-
+    /**
+     * database asset.
+     */
     DATABASE(5),
+    /**
+     * table asset.
+     */
     TABLE(6),
+    /**
+     * fileset asset.
+     */
     FILESET(7),
     ;
 

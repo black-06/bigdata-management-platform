@@ -13,6 +13,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * JacksonListTypeHandler is a {@link org.apache.ibatis.type.TypeHandler},
+ * that parse json array with {@link TypeReference} because type erasure.
+ */
 public abstract class JacksonListTypeHandler<T> extends BaseTypeHandler<List<T>> {
 
     private final ObjectMapper mapper = new ObjectMapper();
