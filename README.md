@@ -17,7 +17,10 @@ mvn clean test
 
 ## Installation
 
-1. Start MySQL and create database
+1. Download/Install Docker and pull MySql 8.0 docker image
+
+
+3. Start MySQL and create database
 
 ```shell
 docker run -itd --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root mysql:5.7
