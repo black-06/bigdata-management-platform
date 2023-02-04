@@ -7,7 +7,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import javax.annotation.Nonnull;
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.StringJoiner;
 
 /**
  * A database name and table name combo in datasource.
@@ -40,11 +39,16 @@ public class AssetPath implements Serializable {
         if (paths.length == 0) {
             return "";
         }
-        StringJoiner joiner = new StringJoiner(sep, prefix, suffix);
-        for (String path : paths) {
-            joiner.add(path);
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < paths.length; i++) {
+            if (i > 0) {
+                builder.append(sep);
+            }
+            builder.append(prefix);
+            builder.append(paths[i]);
+            builder.append(suffix);
         }
-        return joiner.toString();
+        return builder.toString();
     }
 
     public String getName() {

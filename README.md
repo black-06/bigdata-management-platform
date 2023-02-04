@@ -72,3 +72,30 @@ docker exec data-hive-server-1 hive -f /tables.sql
 ```shell
 docker-compose -f ./demo/hive_datasource/docker-compose.yml -p data down
 ```
+
+## How to check docker container
+
+```shell
+docker exec -it mysql mysql -u root -proot
+mysql> show tables from bmp;
++------------------------------+
+| Tables_in_bmp                |
++------------------------------+
+| catalog_asset                |
+| catalog_collection           |
+| catalog_column               |
+| catalog_datasource           |
+| catalog_relation_tag_subject |
+| catalog_tag                  |
++------------------------------+
+```
+
+```shell
+docker exec -it data-hive-server-1 hive
+hive> show tables from default;
+OK
+cpus
+inventory
+users
+Time taken: 0.524 seconds, Fetched: 3 row(s)
+```
