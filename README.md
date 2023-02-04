@@ -7,6 +7,8 @@
 ```shell
 apt install openjdk-8-jdk
 apt install maven
+# docker for test env
+curl -fsSL https://get.docker.com | bash -s docker
 ```
 
 ## Test
@@ -20,7 +22,7 @@ mvn clean test
 1. Start MySQL and create database
 
 ```shell
-docker run -itd --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root mysql:5.7
+docker run -itd --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root mysql:8.0
 docker exec mysql mysql -u root -proot -e "CREATE DATABASE bmp CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';"
 ```
 
@@ -32,12 +34,20 @@ mvn clean package
 
 ## Start
 
+### Only Start catalog Server
+
 ```shell
-java -jar ./bmp-catalog/target/bmp-catalog-1.0-SNAPSHOT.jar
+java -jar ./bmp-catalog/target/bmp-catalog-1.0-SNAPSHOT-exec.jar
 ```
 
 Or debug entry point
-is [Application.java](./bmp-catalog/src/main/java/com/bmp/catalog/Application.java)
+is [CatalogApplication.java](./bmp-catalog/src/main/java/com/bmp/catalog/CatalogApplication.java)
+
+### Start Standalone Server
+
+```shell
+java -jar ./bmp-standalone-server/target/bmp-standalone-server-1.0-SNAPSHOT-exec.jar
+```
 
 ## Demo
 
