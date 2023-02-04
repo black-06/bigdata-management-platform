@@ -50,19 +50,19 @@ Content-Type: application/json
 ]
 
 ### bind tag
-# https://reqbin.com/ih6dwtw9
+# https://reqbin.com/qwqcxary
 POST http://localhost:8080/tag/batch_update
 Content-Type: application/json
 
 {
   "bind": [
     {
-      "subjectID": 1,
+      "subjectID": 2,
       "subjectType": "TABLE",
       "tagID": 1
     },
     {
-      "subjectID": 1,
+      "subjectID": 3,
       "subjectType": "TABLE",
       "tagID": 2
     },
@@ -85,6 +85,7 @@ GET http://localhost:8080/asset?datasourceID=1&withTags=true&withColumns=true&wi
 
 
 ### create mysql datasource
+# https://reqbin.com/pbmlgv6o
 POST http://localhost:8080/datasource
 Content-Type: application/json
 
