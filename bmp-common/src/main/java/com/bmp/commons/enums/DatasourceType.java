@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.NoSuchElementException;
 
 public enum DatasourceType {
+    FAKE(0),
     MYSQL(1),
     HIVE(2),
     ;

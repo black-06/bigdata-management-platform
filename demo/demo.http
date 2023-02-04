@@ -1,4 +1,5 @@
 ### creat hive datasource
+# https://reqbin.com/9ur8j3q6
 POST http://localhost:8080/datasource
 Content-Type: application/json
 
@@ -25,9 +26,11 @@ Content-Type: application/json
 }
 
 ### list hive asset
+# https://reqbin.com/oxza9oih
 GET http://localhost:8080/asset?datasourceID=1&withColumns=true
 
 ### create tags
+# https://reqbin.com/lfadbldu
 POST http://localhost:8080/tag
 Content-Type: application/json
 
@@ -47,6 +50,7 @@ Content-Type: application/json
 ]
 
 ### bind tag
+# https://reqbin.com/ih6dwtw9
 POST http://localhost:8080/tag/batch_update
 Content-Type: application/json
 
@@ -76,4 +80,5 @@ Content-Type: application/json
 }
 
 ### list asset with tags and columns
+# https://reqbin.com/o08yonum
 GET http://localhost:8080/asset?datasourceID=1&withTags=true&withColumns=true&withColumnTags=true

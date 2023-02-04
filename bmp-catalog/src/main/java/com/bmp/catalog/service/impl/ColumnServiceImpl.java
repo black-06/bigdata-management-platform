@@ -17,8 +17,11 @@ import com.bmp.dao.mapper.ColumnMapper;
 import com.bmp.dao.utils.BaseServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -57,8 +60,29 @@ public class ColumnServiceImpl extends BaseServiceImpl<ColumnMapper, Column> imp
 
 
     @Override
-    public Result<Column> updateColumn(Column column) {
-        return Result.error(Status.INTERNAL_SERVER_ERROR_ARGS, "not implemented");
+    public Result<Column> updateColumn(Column update) {
+        Integer id = update.getId();
+        if (id == null || id == 0) {
+            return Result.error(Status.INVALID_PARAM_ARGS, "id");
+        }
+        Column column = columnMapper.selectById(id);
+        if (column == null) {
+            return Result.error(Status.RESOURCE_NOTFOUND_ARGS, "column id=" + id);
+        }
+
+        column.setUpdateTime(Instant.now());
+        if (StringUtils.isNotBlank(update.getDescription())) {
+            column.setDescription(update.getDescription());
+        }
+        columnMapper.updateById(column);
+        return Result.success(column);
     }
 
+    @Override
+    @Transactional
+    public void batchDeleteColumns(List<Integer> assetIDs) {
+        LambdaQueryWrapper<Column> query = new LambdaQueryWrapper<Column>().in(Column::getAssetID, assetIDs);
+        subjectService.detachSubject(SubjectID.ofList(columnMapper.selectList(query)));
+        columnMapper.delete(query);
+    }
 }

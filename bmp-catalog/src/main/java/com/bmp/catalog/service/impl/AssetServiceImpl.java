@@ -21,8 +21,12 @@ import com.bmp.dao.utils.BaseEntity;
 import com.bmp.dao.utils.BaseServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -90,12 +94,37 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
     }
 
     @Override
-    public Result<Asset> updateAsset(Asset asset) {
-        return Result.error(Status.INTERNAL_SERVER_ERROR_ARGS, "not implemented");
+    public Result<Asset> updateAsset(Asset update) {
+        Integer id = update.getId();
+        if (id == null || id == 0) {
+            return Result.error(Status.INVALID_PARAM_ARGS, "id");
+        }
+        Asset asset = assetMapper.selectById(id);
+        if (asset == null) {
+            return Result.error(Status.RESOURCE_NOTFOUND_ARGS, "asset id=" + id);
+        }
+
+        asset.setUpdateTime(Instant.now());
+        if (StringUtils.isNotBlank(update.getDescription())) {
+            asset.setDescription(update.getDescription());
+        }
+        assetMapper.updateById(asset);
+        return Result.success(asset);
     }
 
     @Override
-    public Result<?> deleteAsset(int id) {
-        return Result.error(Status.INTERNAL_SERVER_ERROR_ARGS, "not implemented");
+    @Transactional
+    public void batchDeleteAsset(List<Integer> datasourceIDs) {
+        // query subject id
+        List<SubjectID> subjectList = new ArrayList<>();
+        List<Integer> assetIDs = new ArrayList<>();
+        LambdaQueryWrapper<Asset> query = new LambdaQueryWrapper<Asset>().in(Asset::getDatasourceID, datasourceIDs);
+        for (Asset asset : assetMapper.selectList(query)) {
+            subjectList.add(SubjectID.of(asset));
+            assetIDs.add(asset.getId());
+        }
+        subjectService.detachSubject(subjectList);
+        assetMapper.delete(query);
+        columnService.batchDeleteColumns(assetIDs);
     }
 }

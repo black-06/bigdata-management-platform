@@ -1,4 +1,4 @@
-package com.bmp.catalog;
+package com.bmp.dao;
 
 import com.baomidou.mybatisplus.core.injector.AbstractMethod;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
