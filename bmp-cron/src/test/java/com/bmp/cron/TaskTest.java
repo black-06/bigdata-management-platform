@@ -48,7 +48,7 @@ public class TaskTest {
         tests.add(new ValidateTest(new MockTask(), "task execute delay is null"));
         tests.add(new ValidateTest(
                 new MockTask().setExecuteDelay(Duration.ZERO).setRecurringInterval(Duration.ofMillis(1)),
-                String.format("task recurring interval is wrong, it should be greater than %s", Task.minimalInterval)
+                String.format("task recurring interval is wrong, it should be greater than %s", Task.MINIMAL_INTERVAL)
         ));
         tests.add(new ValidateTest(new MockTask().setExecuteDelay(Duration.ZERO), null));
         tests.add(new ValidateTest(new MockTask().setExecuteDelay(Duration.ofHours(1)), null));

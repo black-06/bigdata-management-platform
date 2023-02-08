@@ -13,20 +13,29 @@ import com.bmp.catalog.vo.AssetView;
 import com.bmp.catalog.vo.DatasourceView;
 import com.bmp.catalog.vo.TagView;
 import com.bmp.commons.Box;
+import com.bmp.commons.enums.SubjectType;
 import com.bmp.commons.result.Result;
 import com.bmp.commons.result.Status;
+import com.bmp.connector.api.ConnectorInfo;
 import com.bmp.dao.entity.Datasource;
 import com.bmp.dao.mapper.DatasourceMapper;
 import com.bmp.dao.utils.BaseServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.SQLException;
+import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static com.bmp.cron.Task.MINIMAL_INTERVAL;
 
 @Service
 @RequiredArgsConstructor
@@ -43,6 +52,21 @@ public class DatasourceServiceImpl extends BaseServiceImpl<DatasourceMapper, Dat
         datasource.setUpdateTime(now);
         if (datasource.getStatus() == null) {
             datasource.setStatus(com.bmp.commons.enums.Status.ACTIVE);
+        }
+        if (datasource.getType() == null) {
+            return Result.error(Status.INVALID_PARAM_ARGS, "unknown datasource type");
+        }
+        if (datasource.getConnectorInfo() == null) {
+            return Result.error(Status.INVALID_PARAM_ARGS, "connector info should not be null");
+        }
+        try {
+            datasource.getConnectorInfo().buildConnector().ping();
+        } catch (Exception e) {
+            return Result.error(Status.CONNECTOR_PING_ERROR_ARGS, e.getMessage());
+        }
+        Duration interval = datasource.getSyncInterval();
+        if (interval != null && interval.compareTo(MINIMAL_INTERVAL) < 0) {
+            return Result.error(Status.INVALID_PARAM_ARGS, "sync interval should be greater than 1s");
         }
         datasourceMapper.insert(datasource);
         return Result.success(datasource);
@@ -113,12 +137,76 @@ public class DatasourceServiceImpl extends BaseServiceImpl<DatasourceMapper, Dat
     }
 
     @Override
-    public Result<Datasource> updateDatasource(Datasource datasource) {
-        return Result.error(Status.INTERNAL_SERVER_ERROR_ARGS, "not implemented");
+    public Result<Datasource> updateDatasource(Datasource update) {
+        Integer id = update.getId();
+        if (id == null || id == 0) {
+            return Result.error(Status.INVALID_PARAM_ARGS, "id");
+        }
+        Datasource datasource = datasourceMapper.selectById(id);
+        if (datasource == null) {
+            return Result.error(Status.RESOURCE_NOTFOUND_ARGS, "datasource id=", id);
+        }
+        datasource.setUpdateTime(Instant.now());
+        if (StringUtils.isNotBlank(update.getName())) {
+            datasource.setName(update.getName());
+        }
+        if (StringUtils.isNotBlank(update.getDescription())) {
+            datasource.setDescription(update.getDescription());
+        }
+        if (update.getStatus() != null) {
+            datasource.setStatus(update.getStatus());
+        }
+        if (update.getType() != null) {
+            datasource.setType(update.getType());
+        }
+        ConnectorInfo info = update.getConnectorInfo();
+        if (info != null) {
+            try {
+                info.buildConnector().ping();
+            } catch (SQLException e) {
+                return Result.error(Status.CONNECTOR_PING_ERROR_ARGS, e.getMessage());
+            }
+            datasource.setConnectorInfo(info);
+        }
+        if (update.getCollectionID() != null) {
+            datasource.setCollectionID(update.getCollectionID());
+        }
+        if (CollectionUtils.isNotEmpty(update.getSyncPaths())) {
+            datasource.setSyncPaths(update.getSyncPaths());
+        }
+        Duration interval = datasource.getSyncInterval();
+        if (interval != null) {
+            if (interval.compareTo(MINIMAL_INTERVAL) < 0) {
+                return Result.error(Status.INVALID_PARAM_ARGS, "sync interval should be greater than 1s");
+            }
+            datasource.setSyncInterval(interval);
+        }
+        datasourceMapper.updateById(datasource);
+        return Result.success(datasource);
     }
 
     @Override
+    @Transactional
     public Result<?> deleteDatasource(int id) {
-        return Result.error(Status.INTERNAL_SERVER_ERROR_ARGS, "not implemented");
+        subjectService.detachSubject(Collections.singletonList(new SubjectID(id, SubjectType.DATASOURCE)));
+        datasourceMapper.deleteById(id);
+        assetService.batchDeleteAsset(Collections.singletonList(id));
+        return Result.success(null);
+    }
+
+    @Override
+    @Transactional
+    public void batchDeleteDatasource(List<Integer> CollectionIDs) {
+        // query subject id
+        List<SubjectID> subjectList = new ArrayList<>();
+        List<Integer> datasourceIDs = new ArrayList<>();
+        LambdaQueryWrapper<Datasource> query = new LambdaQueryWrapper<Datasource>().in(Datasource::getCollectionID, CollectionIDs);
+        for (Datasource datasource : datasourceMapper.selectList(query)) {
+            subjectList.add(SubjectID.of(datasource));
+            datasourceIDs.add(datasource.getId());
+        }
+        subjectService.detachSubject(subjectList);
+        datasourceMapper.delete(query);
+        assetService.batchDeleteAsset(datasourceIDs);
     }
 }

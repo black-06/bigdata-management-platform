@@ -3,9 +3,9 @@ package com.bmp.catalog.analysis;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
-public class Application {
+@SpringBootApplication(scanBasePackages = {"com.bmp"})
+public class AnalysisApplication {
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        SpringApplication.run(AnalysisApplication.class, args);
     }
 }

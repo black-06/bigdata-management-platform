@@ -6,6 +6,9 @@ import com.bmp.catalog.vo.DatasourceView;
 import com.bmp.commons.result.Result;
 import com.bmp.dao.entity.Datasource;
 import com.bmp.dao.utils.BaseService;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 public interface DatasourceService extends BaseService<Datasource> {
     Result<Datasource> createDatasource(Datasource datasource);
@@ -14,5 +17,9 @@ public interface DatasourceService extends BaseService<Datasource> {
 
     IPage<DatasourceView> listDatasource(ListDatasourceRequest request);
 
+    @Transactional
     Result<?> deleteDatasource(int id);
+
+    @Transactional
+    void batchDeleteDatasource(List<Integer> CollectionIDs);
 }

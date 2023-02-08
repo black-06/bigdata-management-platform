@@ -29,9 +29,9 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "catalog_datasource", autoResultMap = true)
 public class Datasource extends BaseEntity implements Subject {
-    @TableField("name")
+    @TableField(value = "name", updateStrategy = FieldStrategy.NOT_EMPTY)
     private String name;
-    @TableField("description")
+    @TableField(value = "description", updateStrategy = FieldStrategy.NOT_EMPTY)
     private String description;
     @TableField("status")
     private Status status;

@@ -1,4 +1,4 @@
-package com.bmp.connector.hive;
+package com.bmp.connector.fake;
 
 import com.bmp.connector.api.Connector;
 import com.bmp.connector.api.RowIterator;
@@ -8,24 +8,15 @@ import com.bmp.connector.api.alignment.IColumn;
 import com.bmp.connector.api.list.Lister;
 import lombok.RequiredArgsConstructor;
 
-import java.sql.SQLException;
-
 @RequiredArgsConstructor
-public class HiveConnector implements Connector {
-    private final HiveConnectorInfo info;
-
+public class FakeConnector implements Connector {
     @Override
     public void ping() {
-        try {
-            HiveUtils.open(info).close();
-        } catch (SQLException e) {
-            throw new IllegalArgumentException("test connection failed");
-        }
     }
 
     @Override
     public Lister getLister() {
-        return new HiveLister(info);
+        return new FakeLister();
     }
 
     @Override
@@ -35,6 +26,6 @@ public class HiveConnector implements Connector {
 
     @Override
     public RowIterator getRowIterator() {
-        return new HiveRowIterator(info);
+        return new FakeRowIterator();
     }
 }

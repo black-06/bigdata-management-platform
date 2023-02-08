@@ -1,4 +1,5 @@
 ### creat hive datasource
+# https://reqbin.com/9ur8j3q6
 POST http://localhost:8080/datasource
 Content-Type: application/json
 
@@ -25,9 +26,11 @@ Content-Type: application/json
 }
 
 ### list hive asset
+# https://reqbin.com/oxza9oih
 GET http://localhost:8080/asset?datasourceID=1&withColumns=true
 
 ### create tags
+# https://reqbin.com/lfadbldu
 POST http://localhost:8080/tag
 Content-Type: application/json
 
@@ -47,18 +50,19 @@ Content-Type: application/json
 ]
 
 ### bind tag
+# https://reqbin.com/qwqcxary
 POST http://localhost:8080/tag/batch_update
 Content-Type: application/json
 
 {
   "bind": [
     {
-      "subjectID": 1,
+      "subjectID": 2,
       "subjectType": "TABLE",
       "tagID": 1
     },
     {
-      "subjectID": 1,
+      "subjectID": 3,
       "subjectType": "TABLE",
       "tagID": 2
     },
@@ -76,4 +80,33 @@ Content-Type: application/json
 }
 
 ### list asset with tags and columns
+# https://reqbin.com/o08yonum
 GET http://localhost:8080/asset?datasourceID=1&withTags=true&withColumns=true&withColumnTags=true
+
+
+### create mysql datasource
+# https://reqbin.com/pbmlgv6o
+POST http://localhost:8080/datasource
+Content-Type: application/json
+
+{
+  "name": "test_mysql",
+  "type": "MYSQL",
+  "connectorInfo": {
+    "type": "MYSQL",
+    "host": "127.0.0.1",
+    "port": "3306",
+    "username": "root",
+    "password": "root"
+  },
+  "collectionID": 1,
+  "syncPaths": [
+    {
+      "paths": [
+        "bmp"
+      ]
+    }
+  ],
+  "syncExecuteTime": 1673675752.371000000,
+  "syncInterval": "PT1M"
+}

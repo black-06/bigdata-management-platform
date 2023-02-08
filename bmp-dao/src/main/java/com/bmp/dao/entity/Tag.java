@@ -1,5 +1,6 @@
 package com.bmp.dao.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.bmp.dao.utils.BaseEntity;
@@ -14,9 +15,9 @@ import java.time.Instant;
 @EqualsAndHashCode(callSuper = true)
 @TableName("catalog_tag")
 public class Tag extends BaseEntity {
-    @TableField("name")
+    @TableField(value = "name", updateStrategy = FieldStrategy.NOT_EMPTY)
     private String name;
-    @TableField("description")
+    @TableField(value = "description", updateStrategy = FieldStrategy.NOT_EMPTY)
     private String description;
 
     @Override

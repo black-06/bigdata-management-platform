@@ -14,5 +14,7 @@ public interface TagSubjectService extends BaseService<TagSubject> {
 
     Map<SubjectID, List<TagView>> listTagSubject(List<SubjectID> subjectIDs);
 
+    void detachSubject(List<SubjectID> subjects);
+
     Result<?> updateTagSubject(UpdateTagSubjectRequest request);
 }

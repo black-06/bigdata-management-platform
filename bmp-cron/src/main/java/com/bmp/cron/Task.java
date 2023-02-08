@@ -65,7 +65,7 @@ public abstract class Task implements Serializable {
     /**
      * set minimal recurring duration to avoid too frequently.
      */
-    public static final Duration minimalInterval = Duration.ofSeconds(1);
+    public static final Duration MINIMAL_INTERVAL = Duration.ofSeconds(1);
 
     private static final ObjectMapper mapper;
 
@@ -90,8 +90,8 @@ public abstract class Task implements Serializable {
         Validate.notNull(task.getId(), "task id is null");
         Validate.notNull(task.type(), "task type is null");
         Validate.notNull(task.getExecuteDelay(), "task execute delay is null");
-        if (task.getRecurringInterval() != null && task.getRecurringInterval().compareTo(minimalInterval) < 0) {
-            throw new IllegalArgumentException(String.format("task recurring interval is wrong, it should be greater than %s", minimalInterval));
+        if (task.getRecurringInterval() != null && task.getRecurringInterval().compareTo(MINIMAL_INTERVAL) < 0) {
+            throw new IllegalArgumentException(String.format("task recurring interval is wrong, it should be greater than %s", MINIMAL_INTERVAL));
         }
     }
 

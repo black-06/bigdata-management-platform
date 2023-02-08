@@ -4,7 +4,7 @@ import com.bmp.commons.enums.DatasourceType;
 import com.bmp.commons.result.Result;
 import com.bmp.connector.api.ConnectorManager;
 import com.bmp.connector.api.list.AssetPath;
-import com.bmp.connector.hive.HiveConnectorInfo;
+import com.bmp.connector.fake.FakeConnectorInfo;
 import com.bmp.dao.entity.Datasource;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -43,7 +43,7 @@ public class DatasourceControllerTest {
         datasource.setType(DatasourceType.HIVE);
         datasource.setCollectionID(1);
 
-        HiveConnectorInfo info = new HiveConnectorInfo("127.0.0.1", "3306", "root", "123");
+        FakeConnectorInfo info = new FakeConnectorInfo("bar");
         datasource.setConnectorInfo(info);
 
         List<AssetPath> paths = new ArrayList<>();

@@ -102,4 +102,16 @@ public class TagSubjectServiceImpl extends BaseServiceImpl<TagSubjectMapper, Tag
         }
         subjectMapper.delete(condition);
     }
+
+    @Override
+    public void detachSubject(List<SubjectID> subjects) {
+        LambdaQueryWrapper<TagSubject> condition = new LambdaQueryWrapper<>();
+        for (SubjectID detach : subjects) {
+            condition = condition.or(sub -> sub
+                    .eq(TagSubject::getSubjectID, detach.getId())
+                    .eq(TagSubject::getSubjectType, detach.getType())
+            );
+        }
+        subjectMapper.delete(condition);
+    }
 }

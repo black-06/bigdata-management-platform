@@ -12,6 +12,8 @@ public interface Connector {
     Lister getLister();
 
     <A extends IColumn, B extends IColumn> Alignment<A, B> getAlignment();
+
+    RowIterator getRowIterator();
 }
 
 

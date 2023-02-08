@@ -19,15 +19,18 @@ mvn clean test
 
 1. Download/Install Docker and pull MySql 8.0 docker image
 
+```shell
+curl -fsSL https://get.docker.com | bash -s docker
+```
 
-3. Start MySQL and create database
+2. Start MySQL and create database
 
 ```shell
-docker run -itd --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root mysql:5.7
+docker run -itd --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root mysql:8.0
 docker exec mysql mysql -u root -proot -e "CREATE DATABASE bmp CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';"
 ```
 
-2. Build jar
+3. Build jar
 
 ```shell
 mvn clean package
@@ -35,12 +38,20 @@ mvn clean package
 
 ## Start
 
+### Only Start catalog Server
+
 ```shell
-java -jar ./bmp-catalog/target/bmp-catalog-1.0-SNAPSHOT.jar
+java -jar ./bmp-catalog/target/bmp-catalog-1.0-SNAPSHOT-exec.jar
 ```
 
 Or debug entry point
-is [Application.java](./bmp-catalog/src/main/java/com/bmp/catalog/Application.java)
+is [CatalogApplication.java](./bmp-catalog/src/main/java/com/bmp/catalog/CatalogApplication.java)
+
+### Start Standalone Server
+
+```shell
+java -jar ./bmp-standalone-server/target/bmp-standalone-server-1.0-SNAPSHOT-exec.jar
+```
 
 ## Demo
 
@@ -64,4 +75,31 @@ docker exec data-hive-server-1 hive -f /tables.sql
 
 ```shell
 docker-compose -f ./demo/hive_datasource/docker-compose.yml -p data down
+```
+
+## How to check docker container
+
+```shell
+docker exec -it mysql mysql -u root -proot
+mysql> show tables from bmp;
++------------------------------+
+| Tables_in_bmp                |
++------------------------------+
+| catalog_asset                |
+| catalog_collection           |
+| catalog_column               |
+| catalog_datasource           |
+| catalog_relation_tag_subject |
+| catalog_tag                  |
++------------------------------+
+```
+
+```shell
+docker exec -it data-hive-server-1 hive
+hive> show tables from default;
+OK
+cpus
+inventory
+users
+Time taken: 0.524 seconds, Fetched: 3 row(s)
 ```

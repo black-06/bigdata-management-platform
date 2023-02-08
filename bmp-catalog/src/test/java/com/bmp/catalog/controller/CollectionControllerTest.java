@@ -2,6 +2,7 @@ package com.bmp.catalog.controller;
 
 import com.bmp.commons.result.Result;
 import com.bmp.dao.entity.Collection;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections4.CollectionUtils;
@@ -18,8 +19,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -32,7 +32,8 @@ class CollectionControllerTest {
 
     private final ObjectMapper mapper = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-            .configure(DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true);
+            .configure(DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
+            .findAndRegisterModules();
 
     @Test
     void createCollection() {
@@ -53,10 +54,13 @@ class CollectionControllerTest {
                 .getResponse()
                 .getContentAsByteArray()
         );
-        Result<?> result = assertDoesNotThrow(() -> mapper.readValue(resp, Result.class));
+        Result<Collection> result = assertDoesNotThrow(() -> mapper.readValue(resp, new TypeReference<Result<Collection>>() {
+        }));
         assertTrue(result.isSuccess());
 
         queryCollectionList();
+
+        updateCollection(result.getData().getId());
     }
 
     void queryCollectionList() {
@@ -66,9 +70,31 @@ class CollectionControllerTest {
                 .getResponse()
                 .getContentAsByteArray()
         );
-        @SuppressWarnings("unchecked")
-        Result<List<Collection>> result = assertDoesNotThrow(() -> mapper.readValue(resp, Result.class));
+        Result<List<Collection>> result = assertDoesNotThrow(() -> mapper.readValue(resp, new TypeReference<Result<List<Collection>>>() {
+        }));
         assertTrue(result.isSuccess());
         assertTrue(CollectionUtils.isNotEmpty(result.getData()));
+    }
+
+    void updateCollection(int id) {
+        Collection collection = new Collection().setId(id).setName("").setDescription("hello");
+        String json = assertDoesNotThrow(() -> mapper.writeValueAsString(collection));
+        byte[] resp = assertDoesNotThrow(() -> mockMvc
+                .perform(MockMvcRequestBuilders.
+                        patch("/collection/{value}", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                )
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn()
+                .getResponse()
+                .getContentAsByteArray()
+        );
+        Result<Collection> result = assertDoesNotThrow(() -> mapper.readValue(resp, new TypeReference<Result<Collection>>() {
+        }));
+        assertTrue(result.isSuccess());
+        assertEquals(id, result.getData().getId());
+        assertEquals("hello", result.getData().getDescription());
     }
 }

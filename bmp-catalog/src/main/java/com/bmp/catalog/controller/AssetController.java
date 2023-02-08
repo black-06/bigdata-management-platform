@@ -49,6 +49,7 @@ public class AssetController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(value = Status.DELETE_ERROR_ARGS, args = {"asset"})
     public Result<?> deleteAsset(@PathVariable("id") int id) {
-        return assetService.deleteAsset(id);
+        assetService.removeById(id);
+        return Result.success(null);
     }
 }
