@@ -7,8 +7,6 @@
 ```shell
 apt install openjdk-8-jdk
 apt install maven
-# docker for test env
-curl -fsSL https://get.docker.com | bash -s docker
 ```
 
 ## Test
@@ -19,14 +17,20 @@ mvn clean test
 
 ## Installation
 
-1. Start MySQL and create database
+1. Download/Install Docker and pull MySql 8.0 docker image
+
+```shell
+curl -fsSL https://get.docker.com | bash -s docker
+```
+
+2. Start MySQL and create database
 
 ```shell
 docker run -itd --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root mysql:8.0
 docker exec mysql mysql -u root -proot -e "CREATE DATABASE bmp CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';"
 ```
 
-2. Build jar
+3. Build jar
 
 ```shell
 mvn clean package
