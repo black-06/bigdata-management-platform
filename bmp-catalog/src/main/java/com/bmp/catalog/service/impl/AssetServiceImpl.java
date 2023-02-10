@@ -15,8 +15,14 @@ import com.bmp.catalog.vo.TagView;
 import com.bmp.commons.Box;
 import com.bmp.commons.result.Result;
 import com.bmp.commons.result.Status;
+import com.bmp.connector.api.Connector;
+import com.bmp.connector.api.LimitPushdown;
+import com.bmp.connector.api.RowIterator;
 import com.bmp.dao.entity.Asset;
+import com.bmp.dao.entity.Column;
+import com.bmp.dao.entity.Datasource;
 import com.bmp.dao.mapper.AssetMapper;
+import com.bmp.dao.mapper.DatasourceMapper;
 import com.bmp.dao.utils.BaseEntity;
 import com.bmp.dao.utils.BaseServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -26,16 +32,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implements AssetService {
     private final AssetMapper assetMapper;
+    private final DatasourceMapper datasourceMapper;
     private final ColumnService columnService;
     private final TagSubjectService subjectService;
 
@@ -63,17 +67,26 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
             tags = Collections.emptyMap();
         }
 
+        int limit = Box.unbox(request.getSampleDataCount());
         Map<Integer, List<ColumnView>> columns;
-        if (Box.unbox(request.getWithColumns())) {
+        if (Box.unbox(request.getWithColumns()) || limit > 0) {
             columns = getColumns(page.getRecords(), request.getWithColumnTags());
         } else {
             columns = Collections.emptyMap();
+        }
+
+        Map<Integer, List<Object[]>> sampleData;
+        if (limit > 0) {
+            sampleData = getSampleData(page.getRecords(), columns, limit);
+        } else {
+            sampleData = Collections.emptyMap();
         }
 
         return page.convert(asset -> new AssetView()
                 .setAsset(asset)
                 .setTags(tags.get(SubjectID.of(asset)))
                 .setColumns(columns.get(asset.getId()))
+                .setSampleData(sampleData.get(asset.getId()))
         );
     }
 
@@ -91,6 +104,48 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
                 .getRecords()
                 .stream()
                 .collect(Collectors.groupingBy(column -> column.getColumn().getAssetID()));
+    }
+
+    private Map<Integer, List<Object[]>> getSampleData(
+            List<Asset> assets, Map<Integer, List<ColumnView>> columnMap, int limit
+    ) {
+        if (CollectionUtils.isEmpty(assets) || limit <= 0) {
+            return Collections.emptyMap();
+        }
+        List<Integer> datasourceIDs = assets.stream().map(Asset::getDatasourceID).collect(Collectors.toList());
+        Map<Integer, Connector> connectorMap = datasourceMapper
+                .selectBatchIds(datasourceIDs)
+                .stream()
+                .collect(Collectors.toMap(
+                        Datasource::getId,
+                        datasource -> datasource.getConnectorInfo().buildConnector(),
+                        (t1, t2) -> t1
+                ));
+        Map<Integer, List<Object[]>> dataMap = new HashMap<>();
+        for (Asset asset : assets) {
+            List<Column> columns = columnMap
+                    .getOrDefault(asset.getId(), Collections.emptyList())
+                    .stream()
+                    .map(ColumnView::getColumn)
+                    .collect(Collectors.toList());
+            if (CollectionUtils.isEmpty(columns)) {
+                continue;
+            }
+            Connector connector = connectorMap.get(asset.getDatasourceID());
+            try (RowIterator iterator = connector.getRowIterator(asset.getAssetPath(), columns)) {
+                if (iterator instanceof LimitPushdown) {
+                    ((LimitPushdown) iterator).applyLimit(limit);
+                }
+                List<Object[]> rst = new ArrayList<>();
+                for (int count = 0; iterator.next() && count < limit; count++) {
+                    rst.add(iterator.getRow().getValues());
+                }
+                dataMap.put(asset.getId(), rst);
+            } catch (Exception e) {
+                throw new RuntimeException("read sample data failed", e);
+            }
+        }
+        return dataMap;
     }
 
     @Override

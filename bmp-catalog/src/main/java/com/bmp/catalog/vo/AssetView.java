@@ -13,6 +13,7 @@ import java.util.List;
 public class AssetView extends BaseView {
     private Asset asset;
     private List<ColumnView> columns;
+    private List<Object[]> sampleData;
 
     public AssetView setTags(List<TagView> tags) {
         super.setTags(tags);

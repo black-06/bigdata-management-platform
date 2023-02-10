@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.bmp.commons.enums.SubjectType;
+import com.bmp.connector.api.alignment.IColumn;
 import com.bmp.dao.utils.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,7 +16,7 @@ import java.time.Instant;
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @TableName("catalog_column")
-public class Column extends BaseEntity implements Subject {
+public class Column extends BaseEntity implements Subject, IColumn {
     @TableField(value = "name", updateStrategy = FieldStrategy.NOT_EMPTY)
     private String name;
     @TableField(value = "description", updateStrategy = FieldStrategy.NOT_EMPTY)

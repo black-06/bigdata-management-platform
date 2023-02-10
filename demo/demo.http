@@ -81,7 +81,7 @@ Content-Type: application/json
 
 ### list asset with tags and columns
 # https://reqbin.com/o08yonum
-GET http://localhost:8080/asset?datasourceID=1&withTags=true&withColumns=true&withColumnTags=true
+GET http://localhost:8080/asset?datasourceID=1&withTags=true&withColumns=true&withColumnTags=true&sampleDataCount=2
 
 
 ### create mysql datasource

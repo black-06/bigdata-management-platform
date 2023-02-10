@@ -19,7 +19,7 @@ import java.time.Instant;
 @Data
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
-@TableName("catalog_asset")
+@TableName(value = "catalog_asset", autoResultMap = true)
 public class Asset extends BaseEntity implements Subject {
     @TableField(value = "name", updateStrategy = FieldStrategy.NOT_EMPTY)
     private String name;

@@ -5,8 +5,11 @@ import com.bmp.connector.api.RowIterator;
 import com.bmp.connector.api.alignment.Alignment;
 import com.bmp.connector.api.alignment.AlignmentByName;
 import com.bmp.connector.api.alignment.IColumn;
+import com.bmp.connector.api.list.AssetPath;
 import com.bmp.connector.api.list.Lister;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 public class FakeConnector implements Connector {
@@ -25,7 +28,7 @@ public class FakeConnector implements Connector {
     }
 
     @Override
-    public RowIterator getRowIterator() {
+    public <C extends IColumn> RowIterator getRowIterator(AssetPath path, List<C> columns) {
         return new FakeRowIterator();
     }
 }

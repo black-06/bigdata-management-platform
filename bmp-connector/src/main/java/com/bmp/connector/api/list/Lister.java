@@ -2,6 +2,7 @@ package com.bmp.connector.api.list;
 
 import com.bmp.commons.enums.AssetType;
 import com.bmp.commons.enums.FileType;
+import com.bmp.connector.api.alignment.IColumn;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -26,7 +27,7 @@ public interface Lister extends AutoCloseable {
 
     @Data
     @Accessors(chain = true)
-    class Column {
+    class Column implements IColumn {
         private String Field;
         private String Type;
         private String Null;
@@ -34,5 +35,13 @@ public interface Lister extends AutoCloseable {
         private String Default;
         private String Extra;
         private String Comment;
+
+        public String getName() {
+            return Field;
+        }
+
+        public String getType() {
+            return Type;
+        }
     }
 }

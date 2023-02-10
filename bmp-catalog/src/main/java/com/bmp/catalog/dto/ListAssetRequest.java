@@ -17,4 +17,5 @@ public class ListAssetRequest implements ListRequest {
     private Boolean withTags;
     private Boolean withColumns;
     private Boolean withColumnTags;
+    private Integer sampleDataCount;
 }
