@@ -17,7 +17,7 @@ mvn clean test
 
 ## Installation
 
-1. Download/Install Docker and pull MySql 8.0 docker image
+1. Download/Install Docker
 
 ```shell
 curl -fsSL https://get.docker.com | bash -s docker
@@ -30,7 +30,13 @@ docker run -itd --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root mysql:8.0
 docker exec mysql mysql -u root -proot -e "CREATE DATABASE bmp CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';"
 ```
 
-3. Build jar
+3. Start Redis
+
+```shell
+docker run -itd --name redis -p 6379:6379 redis:7.0
+```
+
+4. Build jar
 
 ```shell
 mvn clean package

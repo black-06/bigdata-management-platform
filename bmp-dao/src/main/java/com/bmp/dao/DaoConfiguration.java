@@ -3,6 +3,7 @@ package com.bmp.dao;
 import com.baomidou.mybatisplus.core.injector.AbstractMethod;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.extension.injector.methods.InsertBatchSomeColumn;
+import com.bmp.dao.utils.SelectListTo;
 import com.github.yulichang.injector.MPJSqlInjector;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -24,6 +25,7 @@ public class DaoConfiguration {
         public List<AbstractMethod> getMethodList(Class<?> mapperClass, TableInfo tableInfo) {
             List<AbstractMethod> methods = super.getMethodList(mapperClass, tableInfo);
             methods.add(new InsertBatchSomeColumn());
+            methods.add(new SelectListTo());
             return methods;
         }
     }

@@ -1,5 +1,8 @@
-package com.bmp.search.core.filter;
+package com.bmp.search.core.provider.filter;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.bmp.commons.enums.SubjectType;
+import com.bmp.dao.utils.BaseEntity;
 import com.bmp.search.core.Item;
 import com.bmp.search.core.provider.Provider;
 
@@ -13,12 +16,14 @@ public interface Filter {
      * filter one item at one time.
      * It can be used to iterate each item in slice usually.
      */
-    boolean filter(Item item);
+    default boolean filter(Item item) {
+        throw new UnsupportedOperationException();
+    }
 
     /**
      * push filter to sql query to speed up and reduce the amount of data recalled from db.
      * It will return the query clause string as first result.
      * It can't be pushed down when result is a blank str.
      */
-    String pushdownToQuery(ProviderType type);
+    <T extends BaseEntity> boolean pushdownToQuery(QueryWrapper<T> query, SubjectType type);
 }

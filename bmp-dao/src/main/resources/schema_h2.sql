@@ -13,6 +13,9 @@ CREATE TABLE `catalog_collection`
     PRIMARY KEY (`id`)
 );
 
+INSERT INTO `catalog_collection`
+VALUES (1, '1970-01-01 00:00:00', '1970-01-01 00:00:00', 'default', '');
+
 DROP TABLE IF EXISTS `catalog_datasource`;
 CREATE TABLE `catalog_datasource`
 (

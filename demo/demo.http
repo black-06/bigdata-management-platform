@@ -110,3 +110,16 @@ Content-Type: application/json
   "syncExecuteTime": 1673675752.371000000,
   "syncInterval": "PT1M"
 }
+
+### search
+POST http://localhost:8080/search
+Content-Type: application/json
+
+{
+  "session": "1",
+  "paginator": {
+    "size": 10,
+    "num": 1
+  },
+  "query": "test"
+}

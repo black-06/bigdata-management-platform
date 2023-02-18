@@ -4,7 +4,6 @@ import com.bmp.search.core.Item;
 
 import java.util.List;
 
-
 /**
  * packs search items with extra information.
  */

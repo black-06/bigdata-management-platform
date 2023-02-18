@@ -12,6 +12,10 @@ spring:
       # embedded: Only initialize an embedded database. Default value.
       # never: Only initialize an embedded database.
       mode: always
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    database: 0
 
 logging:
   level:

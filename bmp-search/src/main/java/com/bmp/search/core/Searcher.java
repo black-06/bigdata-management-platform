@@ -1,47 +1,99 @@
 package com.bmp.search.core;
 
-import com.bmp.search.core.aggregator.Aggregation;
-import com.bmp.search.core.aggregator.Aggregator;
-import com.bmp.search.core.filter.BatchFilter;
-import com.bmp.search.core.packer.Packer;
-import com.bmp.search.core.provider.Provider;
-import com.bmp.search.core.ranker.Ranker;
+import com.bmp.connector.api.ConnectorManager;
+import com.bmp.search.core.aggregator.Aggregators;
+import com.bmp.search.core.packer.Packers;
+import com.bmp.search.core.provider.Providers;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.util.List;
 
+@Component
+@RequiredArgsConstructor
 public class Searcher {
-    private final SearchRequest request;
+    public static Duration TTL = Duration.ofHours(1);
 
-    private Provider provider;
-    private List<BatchFilter> filters;
-    private Ranker ranker;
-    private List<Aggregator> aggregators;
-    private List<Packer> packers;
+    private final StringRedisTemplate redisTemplate;
 
-    private Searcher(SearchRequest request) {
-        this.request = request;
-        // TODO: init searcher
-    }
-
-    public SearchResponse searchInternal() throws RuntimeException {
-        List<Item> items = provider.recall(request);
-
-        for (BatchFilter filter : filters) {
-            items = filter.filter(items);
+    public SearchResponse search(SearchRequest request) {
+        SortType sortType = request.getSortType();
+        if (sortType == null) {
+            sortType = SortType.GENERAL;
         }
 
-        items = ranker.rank(items);
+        String key = marshalKey(request);
 
-        Aggregation aggregation = new Aggregation();
-        for (Aggregator aggregator : aggregators) {
-            aggregation.union(aggregator.aggregate(items));
+        SearchResponse response = unmarshalValue(redisTemplate.boundValueOps(key).get());
+        if (response != null) {
+            redisTemplate.boundValueOps(key).expire(TTL);
+            if (response.getSortType() != sortType) {
+                sortType.sort(response.getItems());
+            }
+            return response;
         }
 
-        return new SearchResponse(items, aggregation, items.size());
+        List<Item> items = Providers.Instance.recall(request);
+        items = Packers.Instance.pack(items);
+        sortType.sort(items);
+        response = new SearchResponse(items, items.size(), Aggregators.Instance.aggregate(items), sortType);
+
+        redisTemplate.boundValueOps(key).set(marshalValue(response), TTL);
+
+        return response;
     }
 
-    public static SearchResponse search(SearchRequest request) {
-        // TODO: cache
-        return new Searcher(request).searchInternal();
+    private final ObjectMapper mapper = new ObjectMapper();
+
+    {
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        ConnectorManager.registerSubtypes(mapper);
+        // for PolymorphicType Subject
+        mapper.activateDefaultTyping(mapper.getPolymorphicTypeValidator(), ObjectMapper.DefaultTyping.NON_CONCRETE_AND_ARRAYS);
+    }
+
+    private String marshalKey(SearchRequest request) {
+        Key key = new Key();
+        key.setSession(request.getSession());
+        key.setQuery(request.getQuery());
+        key.setFilter(request.getFilter());
+        try {
+            return mapper.writeValueAsString(key);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private String marshalValue(SearchResponse response) {
+        try {
+            return mapper.writeValueAsString(response);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private SearchResponse unmarshalValue(String value) {
+        if (StringUtils.isBlank(value)) {
+            return null;
+        }
+        try {
+            return mapper.readValue(value, SearchResponse.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Data
+    public static class Key {
+        private String session;
+        private String query;
+        private SearchRequest.Filter filter;
     }
 }
