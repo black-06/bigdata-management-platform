@@ -41,39 +41,21 @@ public class Aggregation {
     private Map<Integer, Integer> tag;
 
     public void union(Aggregation other) {
-        if (MapUtils.isEmpty(this.datasourceType)) {
-            this.datasourceType = new HashMap<>();
-        }
-        if (MapUtils.isNotEmpty(other.datasourceType)) {
-            this.datasourceType.putAll(other.datasourceType);
-        }
+        this.datasourceType = merge(this.datasourceType, other.datasourceType);
+        this.subjectType = merge(this.subjectType, other.subjectType);
+        this.collection = merge(this.collection, other.collection);
+        this.datasource = merge(this.datasource, other.datasource);
+        this.tag = merge(this.tag, other.tag);
+    }
 
-        if (MapUtils.isEmpty(this.subjectType)) {
-            this.subjectType = new HashMap<>();
+    private static <K> Map<K, Integer> merge(Map<K, Integer> map1, Map<K, Integer> map2) {
+        Map<K, Integer> result = new HashMap<>();
+        if (MapUtils.isNotEmpty(map1)) {
+            map1.forEach((k, v) -> result.merge(k, v, Integer::sum));
         }
-        if (MapUtils.isNotEmpty(other.subjectType)) {
-            this.subjectType.putAll(other.subjectType);
+        if (MapUtils.isNotEmpty(map2)) {
+            map2.forEach((k, v) -> result.merge(k, v, Integer::sum));
         }
-
-        if (MapUtils.isEmpty(this.collection)) {
-            this.collection = new HashMap<>();
-        }
-        if (MapUtils.isNotEmpty(other.collection)) {
-            this.collection.putAll(other.collection);
-        }
-
-        if (MapUtils.isEmpty(this.datasource)) {
-            this.datasource = new HashMap<>();
-        }
-        if (MapUtils.isNotEmpty(other.datasource)) {
-            this.datasource.putAll(other.datasource);
-        }
-
-        if (MapUtils.isEmpty(this.tag)) {
-            this.tag = new HashMap<>();
-        }
-        if (MapUtils.isNotEmpty(other.tag)) {
-            this.tag.putAll(other.tag);
-        }
+        return result;
     }
 }
