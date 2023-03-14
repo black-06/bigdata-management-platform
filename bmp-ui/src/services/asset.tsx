@@ -1,5 +1,4 @@
 import {AssetType, FileType, GetRequest, Result} from "@/services/common";
-import {TagView} from "@/services/tag";
 
 export interface Asset {
     id: number
@@ -16,7 +15,7 @@ export interface Asset {
 }
 
 export interface AssetView extends Asset {
-    tags?: TagView[]
+    tags: string[]
 }
 
 export async function queryAsset(req: GetRequest): Promise<Result<Asset>> {

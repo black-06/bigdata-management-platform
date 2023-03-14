@@ -1,14 +1,16 @@
 import './catalog.less'
 
-import React, {useState} from 'react';
-import {Button, Card, Descriptions, Input, Layout, Row, Space, Table, Tag, theme, Tree} from 'antd';
-import {CheckOutlined, CloseOutlined, DownOutlined, PlusOutlined, TagOutlined} from '@ant-design/icons';
+import React from 'react';
+import {Card, Descriptions, Layout, Space, Table, theme, Tree} from 'antd';
+import {DownOutlined} from '@ant-design/icons';
 import type {DataNode} from 'antd/es/tree';
-import {TagView, UpdateTagSubjectRequest} from "@/services/tag";
-import {Trunc} from "@/utils/string";
 import "@/utils/collection"
 import {ColumnView} from "@/services/column";
 import {AssetView} from "@/services/asset";
+import {AssetType, FileType, toSubjectType} from "@/services/common";
+import moment from "moment";
+import {ColumnTagsSuite, TagsSuite} from "@/components/tags";
+import {ColumnsType} from "antd/es/table";
 
 const treeData: DataNode[] = [
     {
@@ -61,147 +63,100 @@ const treeData: DataNode[] = [
     },
 ];
 
-const Editor: (confirm: () => void) => {
-    button: JSX.Element,
-    edit: boolean,
-} = (
-    confirm: () => void
-) => {
-    const [edit, editSet] = useState(false)
-    return {
-        button: (
-            edit ? (
-                <Space>
-                    <Button onClick={() => editSet(false)}>Cancel</Button>
-                    <Button type="primary" onClick={() => {
-                        editSet(false)
-                        confirm()
-                    }}>Save</Button>
-                </Space>
-            ) : (
-                <Button type="primary" onClick={() => editSet(true)}>Edit</Button>
-            )
-        ),
-        edit: edit
-    }
+const {Sider, Content} = Layout;
+
+function formatDate(d: Date): string {
+    return moment(d).format("YYYY-MM-DD hh:mm:ss")
 }
-
-const NewInputTag: (props: { confirm: (value: string) => void }) => JSX.Element = (props: {
-    confirm: (value: string) => void
-}) => {
-    const [input, inputSet] = useState(false)
-    const [value, valueSet] = useState("");
-
-    return input ? <Input.Group compact>
-            <Input
-                size="small"
-                style={{width: "70%"}}
-                type="text"
-                onChange={(e) => {
-                    valueSet(e.target.value)
-                }}
-            />
-            <Button
-                size="small"
-                icon={<CheckOutlined style={{fontSize: 9}}/>}
-                onClick={() => {
-                    inputSet(false)
-                    props.confirm(value)
-                }}
-            />
-            <Button
-                size="small"
-                icon={<CloseOutlined style={{fontSize: 9}}/>}
-                onClick={() => {
-                    inputSet(false)
-                }}
-            />
-        </Input.Group> :
-        <Tag onClick={() => {
-            inputSet(true)
-        }}><PlusOutlined/> New Tag </Tag>
-}
-
-const {Header, Footer, Sider, Content} = Layout;
 
 const CatalogPage: React.FC = () => {
-    const asset: AssetView = {}
+    const asset: AssetView = {
+        id: 1,
+        create_time: new Date(),
+        update_time: new Date(),
+        name: "test name",
+        description: "test desc",
+        datasource_id: 2,
+        type: AssetType.DATABASE,
+        path: "/test_path",
+        file_type: FileType.NO,
+        comment: "test comment",
+        details: "test details",
 
-    const [edit, editSet] = useState(false)
-
-    // TODO: fetch
-    const [view, viewSet] = useState([
-        {id: 1, name: "tag 1"},
-        {id: 2, name: "tag 2"},
-        {id: 3, name: "tag 3"},
-    ])
-
-    const [req, reqSet] = useState(new UpdateTagSubjectRequest())
-
-    const {
-        token: {colorBgContainer},
-    } = theme.useToken();
-
-    const tagEditor = Editor(() => {
-        // TODO: fetch
-    });
-    const columnTagEditor = Editor(() => {
-        // TODO: fetch
-    });
-
+        tags: [
+            "tag 1", "tag 2", "tag 3", "tag 4", "tag 5",
+            "tag 11", "tag 12", "tag 13", "tag 14", "tag 15",
+            "tag 21", "tag 22", "tag 23", "tag 24", "tag 25",
+            "tag tag tag tag tag tag tag tag tag tag tag tag tag tag tag tag tag tag tag tag tag tag tag tag"
+        ]
+    }
 
     const columns: ColumnView[] = [
         {
             id: 1,
-            create_time: 1,
-            update_time: 2,
-            name: "column 2",
-            description: "",
+            create_time: new Date(),
+            update_time: new Date(),
+            name: "column_1",
+            description: "column_desc_1,column_desc_1,column_desc_1,column_desc_1,column_desc_1,column_desc_1,column_desc_1",
             type: "varchar",
-            comment: "",
-            details: "",
-            tags: [{id: 1, name: "sss"}]
+            comment: "comment_1",
+            details: "details_1",
+            tags: ["sss_1", "s2_123"]
         }, {
-            id: 1,
-            create_time: 1,
-            update_time: 2,
-            name: "column 2",
-            description: "",
-            type: "varchar",
-            comment: "",
-            details: "",
-            tags: [],
+            id: 2,
+            create_time: new Date(),
+            update_time: new Date(),
+            name: "column_2",
+            description: "column_desc_2",
+            type: "int",
+            comment: "comment_2",
+            details: "details_2",
+            tags: ["sss_2"]
         }
     ]
 
-    const columnRender = (views: TagView[], record: any, index: number) => {
-        return columnTagEditor.edit ? (
-            <>{
-                value.map((view: TagView) => {
-                    return <Tag
-                        closable
-                        onClose={() => detachSet(value => value.Add(view.id))}
-                    ><TagOutlined/> {Trunc(view.name, 50)}</Tag>
-                })
-            }<NewInputTag confirm={(value: string) => {
-                viewSet([...value, {id: 0, name: value}])
-                bindSet(bind => bind.Add(value))
-            }}/>
-            </>
-        ) : (
-            view.map(value => {
-                return <Tag><TagOutlined/> {Trunc(value.name, 50)}</Tag>
-            })
-        )
+    const {token: {colorBgContainer}} = theme.useToken();
 
-        columnTagEditor
-        console.log(value)
-        console.log(record)
-        console.log(index)
-        return (
-            <Row>1</Row>
-        )
-    }
+    const [editor, tags] = TagsSuite({
+        id: asset.id,
+        type: toSubjectType(asset.type),
+        tags: asset.tags
+    }, req => {
+        // TODO: fetch
+
+        const detach = new Set<string>()
+        req.detach.forEach(value => {
+            detach.add(value.tag)
+        })
+
+        const tags: string[] = []
+        asset.tags.forEach(tag => {
+            if (!detach.has(tag)) tags.push(tag)
+        })
+        req.bind.forEach(value => tags.push(value.tag))
+        return tags
+    })
+
+    const [columnEditor, columnTags] = ColumnTagsSuite(columns, req => {
+        // TODO: fetch
+        return columns
+    })
+
+    const schema: ColumnsType<ColumnView> = [
+        {title: "ID", dataIndex: "id"},
+        {title: "Name", dataIndex: "name"},
+        {title: "Type", dataIndex: "type"},
+        {title: "Description", dataIndex: "description", ellipsis: true},
+        {title: "Comment", dataIndex: "comment"},
+        {title: "Details", dataIndex: "details"},
+        {
+            title: "Tags",
+            dataIndex: "tags",
+            render: (value: any, record: ColumnView) => columnTags.get(record.id)
+        },
+        {title: "CreateTime", dataIndex: "create_time"},
+        {title: "UpdateTime", dataIndex: "update_time"},
+    ]
 
     return (
         <Layout style={{height: "100vh"}}>
@@ -221,55 +176,32 @@ const CatalogPage: React.FC = () => {
             <Content style={{
                 margin: "24px"
             }}>
-                <Space direction="vertical" size="middle">
-                    <Card title={"leaf"}>
+                <Space direction="vertical" size="middle" style={{width: "100%"}}>
+                    <Card title={asset.name}>
                         <Descriptions column={2}>
-                            <Descriptions.Item label="ID">1</Descriptions.Item>
-                            <Descriptions.Item label="Type">Table</Descriptions.Item>
-                            <Descriptions.Item label="Path">parent1 / parent1-0 / leaf</Descriptions.Item>
-                            <Descriptions.Item label="Description">this is a desc</Descriptions.Item>
-                            <Descriptions.Item label="CreateTime">2021-03-04 18:37:41</Descriptions.Item>
-                            <Descriptions.Item label="UpdateTime">2021-03-04 18:37:41</Descriptions.Item>
+                            <Descriptions.Item label="ID">{asset.id}</Descriptions.Item>
+                            <Descriptions.Item label="Type">{asset.type}</Descriptions.Item>
+                            <Descriptions.Item label="Path">{asset.path}</Descriptions.Item>
+                            <Descriptions.Item label="Description">{asset.description}</Descriptions.Item>
+                            <Descriptions.Item label="CreateTime">{formatDate(asset.create_time)}</Descriptions.Item>
+                            <Descriptions.Item label="UpdateTime">{formatDate(asset.update_time)}</Descriptions.Item>
                         </Descriptions>
                     </Card>
-                    <Card title={"Tag"} extra={tagEditor.button}>
-                        <Space wrap={true}>{
-                            tagEditor.edit ? (
-                                <>{
-                                    view.map((view: TagView) => {
-                                        return <Tag
-                                            closable
-                                            onClose={() => reqSet(req => req.addDetach({
-                                                subject_id: asset.id, subject_type: undefined
-                                            }))}
-                                        ><TagOutlined/> {Trunc(view.name, 50)}</Tag>
-                                    })
-                                }<NewInputTag confirm={(value: string) => {
-                                    viewSet([...view, {id: 0, name: value}])
-                                    bindSet(bind => bind.Add(value))
-                                }}/>
-                                </>
-                            ) : (
-                                view.map(value => {
-                                    return <Tag><TagOutlined/> {Trunc(value.name, 50)}</Tag>
-                                })
-                            )
-                        }</Space></Card>
-                    <Card title={"Fields"} extra={columnTagEditor.button}>
+                    <Card title={"Connector Info"}>
+                        <Descriptions column={2}>
+
+                        </Descriptions>
+                    </Card>
+                    <Card title={"Tag"} extra={editor}>
+                        <Space wrap>{tags}</Space>
+                    </Card>
+                    <Card title={"Fields"} extra={columnEditor}>
                         <Table
                             bordered
-                            columns={[
-                                {title: "ID", dataIndex: "id"},
-                                {title: "CreateTime", dataIndex: "create_time"},
-                                {title: "UpdateTime", dataIndex: "update_time"},
-                                {title: "Name", dataIndex: "name"},
-                                {title: "Type", dataIndex: "type"},
-                                {title: "Description", dataIndex: "description"},
-                                {title: "Comment", dataIndex: "comment"},
-                                {title: "Details", dataIndex: "details"},
-                                {title: "Tags", dataIndex: "tags", render: columnRender},
-                            ]}
+                            columns={schema}
                             dataSource={columns}
+                            rowKey={"id"}
+                            scroll={{x: "100vw"}}
                         >
                         </Table>
                     </Card>

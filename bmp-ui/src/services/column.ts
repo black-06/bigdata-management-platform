@@ -1,9 +1,7 @@
-import {TagView} from "@/services/tag";
-
 export interface Column {
     id: number
-    create_time: number
-    update_time: number
+    create_time: Date
+    update_time: Date
     name: string
     description: string
     type: string
@@ -12,5 +10,5 @@ export interface Column {
 }
 
 export interface ColumnView extends Column {
-    tags?: TagView[]
+    tags: string[]
 }

@@ -14,6 +14,20 @@ export enum AssetType {
     FILESET = 3,
 }
 
+export function toSubjectType(assetType: AssetType): SubjectType {
+    switch (assetType) {
+        case AssetType.DATABASE:
+            return SubjectType.DATABASE
+        case AssetType.TABLE:
+            return SubjectType.TABLE
+        case AssetType.FILESET:
+            return SubjectType.FILESET
+        default:
+            return SubjectType.ASSET
+    }
+}
+
+
 export enum FileType {
     NO,
     CSV,
@@ -30,4 +44,10 @@ export enum SubjectType {
     DATABASE = 5,
     TABLE = 6,
     FILESET = 7,
+}
+
+export interface Subject {
+    id: number
+    type: SubjectType
+    tags: string[]
 }

@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "antd": "^5.2.3",
+    "moment": "^2.29.4",
     "umi": "^4.0.55"
   },
   "devDependencies": {
