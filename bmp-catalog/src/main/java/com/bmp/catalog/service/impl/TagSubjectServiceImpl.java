@@ -1,12 +1,14 @@
 package com.bmp.catalog.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.toolkit.Db;
 import com.bmp.catalog.dto.SubjectID;
 import com.bmp.catalog.dto.UpdateTagSubjectRequest;
 import com.bmp.catalog.service.TagSubjectService;
 import com.bmp.catalog.vo.TagView;
 import com.bmp.commons.enums.SubjectType;
 import com.bmp.commons.result.Result;
+import com.bmp.dao.entity.Asset;
 import com.bmp.dao.entity.Tag;
 import com.bmp.dao.entity.TagSubject;
 import com.bmp.dao.mapper.TagSubjectMapper;
@@ -20,10 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -71,19 +70,41 @@ public class TagSubjectServiceImpl extends BaseServiceImpl<TagSubjectMapper, Tag
         return Result.success(null);
     }
 
+    private boolean isAsset(TagSubject subject) {
+        SubjectType subjectType = subject.getSubjectType();
+        return subjectType == SubjectType.ASSET ||
+                subjectType == SubjectType.DATABASE ||
+                subjectType == SubjectType.TABLE ||
+                subjectType == SubjectType.FILESET;
+    }
+
     @Transactional
     public void batchCreate(List<TagSubject> subjects) {
+        List<Integer> assetIDs = subjects.stream()
+                .filter(this::isAsset)
+                .map(TagSubject::getSubjectID)
+                .collect(Collectors.toList());
+        List<Asset> assets = Db.listByIds(assetIDs, Asset.class);
+        Map<Integer, SubjectType> assetTypes = new HashMap<>();
+        for (Asset asset : assets) {
+            assetTypes.put(asset.getId(), asset.type());
+        }
+
         Instant now = Instant.now();
         HashSet<TagSubject> creates = new HashSet<>(subjects);
+
         LambdaQueryWrapper<TagSubject> condition = new LambdaQueryWrapper<>();
         for (TagSubject create : creates) {
+            SubjectType type = isAsset(create) ? assetTypes.get(create.getSubjectID()) : create.getSubjectType();
             condition = condition.or(sub -> sub
                     .eq(TagSubject::getTagID, create.getTagID())
                     .eq(TagSubject::getSubjectID, create.getSubjectID())
-                    .eq(TagSubject::getSubjectType, create.getSubjectType())
+                    .eq(TagSubject::getSubjectType, type)
             );
-            create.setCreateTime(now).setUpdateTime(now);
+            // modify asset type
+            create.setCreateTime(now).setUpdateTime(now).setSubjectType(type);
         }
+        // remove duplicates
         subjectMapper.selectList(condition).forEach(creates::remove);
         if (creates.isEmpty()) {
             return;

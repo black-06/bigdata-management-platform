@@ -3,6 +3,7 @@ package com.bmp.catalog.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.toolkit.Db;
 import com.bmp.catalog.dto.ListAssetRequest;
 import com.bmp.catalog.dto.ListDatasourceRequest;
 import com.bmp.catalog.dto.SubjectID;
@@ -17,6 +18,7 @@ import com.bmp.commons.enums.SubjectType;
 import com.bmp.commons.result.Result;
 import com.bmp.commons.result.Status;
 import com.bmp.connector.api.ConnectorInfo;
+import com.bmp.dao.entity.Collection;
 import com.bmp.dao.entity.Datasource;
 import com.bmp.dao.mapper.DatasourceMapper;
 import com.bmp.dao.utils.BaseServiceImpl;
@@ -50,6 +52,14 @@ public class DatasourceServiceImpl extends BaseServiceImpl<DatasourceMapper, Dat
         datasource.setId(null);
         datasource.setCreateTime(now);
         datasource.setUpdateTime(now);
+        Integer collectionID = datasource.getCollectionID();
+        if (collectionID == null) {
+            return Result.error(Status.INVALID_PARAM_ARGS, "unknown collection id");
+        }
+        Collection collection = Db.getById(collectionID, Collection.class);
+        if (collection == null) {
+            return Result.error(Status.INVALID_PARAM_ARGS, "unknown collection id");
+        }
         if (datasource.getStatus() == null) {
             datasource.setStatus(com.bmp.commons.enums.Status.ACTIVE);
         }

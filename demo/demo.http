@@ -1,3 +1,13 @@
+### create collection
+# https://reqbin.com/tlyn6lmz
+POST http://localhost:8080/collection
+Content-Type: application/json
+
+{
+  "name": "test_collection",
+  "description": "it's a test collection"
+}
+
 ### creat hive datasource
 # https://reqbin.com/9ur8j3q6
 POST http://localhost:8080/datasource
@@ -25,7 +35,34 @@ Content-Type: application/json
   "syncInterval": "PT1M"
 }
 
-### list hive asset
+### or create mysql datasource
+# https://reqbin.com/pbmlgv6o
+POST http://localhost:8080/datasource
+Content-Type: application/json
+
+{
+  "name": "test_mysql",
+  "type": "MYSQL",
+  "connectorInfo": {
+    "type": "MYSQL",
+    "host": "127.0.0.1",
+    "port": "3306",
+    "username": "root",
+    "password": "root"
+  },
+  "collectionID": 1,
+  "syncPaths": [
+    {
+      "paths": [
+        "bmp"
+      ]
+    }
+  ],
+  "syncExecuteTime": 1673675752.371000000,
+  "syncInterval": "PT1M"
+}
+
+### list asset
 # https://reqbin.com/oxza9oih
 GET http://localhost:8080/asset?datasourceID=1&withColumns=true
 
@@ -58,12 +95,12 @@ Content-Type: application/json
   "bind": [
     {
       "subjectID": 2,
-      "subjectType": "TABLE",
+      "subjectType": "ASSET",
       "tagID": 1
     },
     {
       "subjectID": 3,
-      "subjectType": "TABLE",
+      "subjectType": "ASSET",
       "tagID": 2
     },
     {
@@ -83,35 +120,8 @@ Content-Type: application/json
 # https://reqbin.com/o08yonum
 GET http://localhost:8080/asset?datasourceID=1&withTags=true&withColumns=true&withColumnTags=true&sampleDataCount=2
 
-
-### create mysql datasource
-# https://reqbin.com/pbmlgv6o
-POST http://localhost:8080/datasource
-Content-Type: application/json
-
-{
-  "name": "test_mysql",
-  "type": "MYSQL",
-  "connectorInfo": {
-    "type": "MYSQL",
-    "host": "127.0.0.1",
-    "port": "3306",
-    "username": "root",
-    "password": "root"
-  },
-  "collectionID": 1,
-  "syncPaths": [
-    {
-      "paths": [
-        "bmp"
-      ]
-    }
-  ],
-  "syncExecuteTime": 1673675752.371000000,
-  "syncInterval": "PT1M"
-}
-
 ### search
+# https://reqbin.com/vt02xiwp
 POST http://localhost:8080/search
 Content-Type: application/json
 
